@@ -1,0 +1,38 @@
+[gd_scene load_steps=7 format=3 uid="uid://b2jlaxawtkqqr"]
+
+[ext_resource type="Script" path="res://scripts/World1.cs" id="1_0y7pm"]
+[ext_resource type="Texture2D" uid="uid://d13qu5oc2vbfw" path="res://textures/terrain/desert_rocky_d_pixellated.png" id="1_ly40o"]
+[ext_resource type="Texture2D" uid="uid://cymde5iuwmkfb" path="res://textures/terrain/desert_rocky_n.jpg" id="2_l5ukt"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nqoku"]
+size = Vector3(100, 2, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nw28y"]
+albedo_texture = ExtResource("1_ly40o")
+normal_texture = ExtResource("2_l5ukt")
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+uv1_triplanar = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_4e2tb"]
+material = SubResource("StandardMaterial3D_nw28y")
+size = Vector3(100, 2, 100)
+
+[node name="World1" type="Node" node_paths=PackedStringArray("playerSpawn")]
+script = ExtResource("1_0y7pm")
+playerSpawn = NodePath("PlayerSpawn")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_nqoku")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_4e2tb")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.444713, 0.895673, 0, -0.895673, 0.444713, 0, 9.0954, 0)
+shadow_enabled = true
+
+[node name="PlayerSpawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 46)
