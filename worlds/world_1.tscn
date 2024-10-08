@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://b2jlaxawtkqqr"]
+[gd_scene load_steps=8 format=3 uid="uid://b2jlaxawtkqqr"]
 
 [ext_resource type="Script" path="res://scripts/World1.cs" id="1_0y7pm"]
 [ext_resource type="Texture2D" uid="uid://d13qu5oc2vbfw" path="res://textures/terrain/desert_rocky_d_pixellated.png" id="1_ly40o"]
 [ext_resource type="Texture2D" uid="uid://cymde5iuwmkfb" path="res://textures/terrain/desert_rocky_n.jpg" id="2_l5ukt"]
+[ext_resource type="PackedScene" uid="uid://uln80nfmqdwu" path="res://characters/dummy.tscn" id="4_kbkui"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nqoku"]
 size = Vector3(100, 2, 100)
@@ -30,9 +31,16 @@ shape = SubResource("BoxShape3D_nqoku")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("BoxMesh_4e2tb")
 
+[node name="Clutter" type="Node" parent="Ground"]
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.444713, 0.895673, 0, -0.895673, 0.444713, 0, 9.0954, 0)
 shadow_enabled = true
 
 [node name="PlayerSpawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 46)
+
+[node name="Entities" type="Node" parent="."]
+
+[node name="Dummy" parent="Entities" instance=ExtResource("4_kbkui")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 39.7758)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://b6kn3hmr43son"]
+[gd_scene load_steps=5 format=3 uid="uid://b6kn3hmr43son"]
 
 [ext_resource type="Script" path="res://scripts/Player.cs" id="1_vatis"]
 
@@ -7,9 +7,11 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_ha2hm"]
 size = Vector3(1, 2, 1)
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Viewport")]
+[sub_resource type="SphereShape3D" id="SphereShape3D_konmw"]
+radius = 1.0
+
+[node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_vatis")
-Viewport = NodePath("Camera3D")
 
 [node name="Pivot" type="Node3D" parent="."]
 
@@ -21,5 +23,19 @@ mesh = SubResource("CapsuleMesh_e2wna")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_ha2hm")
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="AttackCooldown" type="Timer" parent="."]
+one_shot = true
+
+[node name="CameraPivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.63181, -0.510776)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+
+[node name="Hitbox" type="ShapeCast3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.87174)
+shape = SubResource("SphereShape3D_konmw")
+target_position = Vector3(0, 0, 0)
+collision_mask = 21
+collide_with_areas = true
+collide_with_bodies = false
+debug_shape_custom_color = Color(1, 0, 0, 1)
