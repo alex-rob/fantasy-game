@@ -12,7 +12,7 @@ public partial class Main : Node
         _player = (Player)ResourceLoader.Load<PackedScene>("res://characters/player.tscn").Instantiate();
         _currentWorld = (World)ResourceLoader.Load<PackedScene>("res://worlds/world_1.tscn").Instantiate();
         // When the world is ready, move the player to the player spawn
-        _currentWorld.OnWorldReady += (Node3D playerSpawn) => _player.Transform = playerSpawn.Transform;
+        _currentWorld.OnWorldReady += (Node3D playerSpawn) => _player.GlobalPosition = playerSpawn.GlobalPosition;
         AddChild(_player);
         AddChild(_currentWorld);
         GD.Print("Spawning Complete");
