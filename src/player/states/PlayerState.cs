@@ -27,9 +27,9 @@ public partial class PlayerState : IBaseState<Player>
 
     /*
         Enter()
-        Behavior that occurs when the player enters the state
+        Behavior that occurs when the player enters the state.
     */
-    public void Enter()
+    public virtual void Enter()
     {
         // TODO: implement animation playing and play an animation/sound here.
         return;
@@ -37,9 +37,9 @@ public partial class PlayerState : IBaseState<Player>
 
     /*
         Exit()
-        Behavior that occurs when the player leaves the state
+        Behavior that occurs when the player leaves the state.
     */
-    public void Exit()
+    public virtual void Exit()
     {
         return;
     }
@@ -48,8 +48,10 @@ public partial class PlayerState : IBaseState<Player>
         ProcessInput(@event)
         Accepts an InputEvent object and processes any relevant inputs for the state and
         input handling logic.
+        Returning type is the class of which state we are transitioning to, where null
+        indicates no transition needed.
     */
-    public IBaseState<Player>? ProcessInput(InputEvent @event)
+    public virtual IBaseState<Player>? ProcessInput(InputEvent @event)
     {
         return null;
     }
@@ -57,8 +59,10 @@ public partial class PlayerState : IBaseState<Player>
     /*
         ProcessFrame(delta)
         Behavior that occurs on every frame. To be used during the player's _Process layer.
+        Returning type is the class of which state we are transitioning to, where null
+        indicates no transition needed.
     */
-    public IBaseState<Player>? ProcessFrame(double delta)
+    public virtual IBaseState<Player>? ProcessFrame(double delta)
     {
         return null;
     }
@@ -66,8 +70,10 @@ public partial class PlayerState : IBaseState<Player>
     /*
         ProcessPhysics(delta)
         Behavior that occurs on every frame. To be used during the player's _ProcessPhysics layer.
+        Returning type is the class of which state we are transitioning to, where null
+        indicates no transition needed.
     */
-    public IBaseState<Player>? ProcessPhysics(double delta)
+    public virtual IBaseState<Player>? ProcessPhysics(double delta)
     {
         return null;
     }
