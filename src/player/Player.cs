@@ -17,7 +17,7 @@ public partial class Player : CharacterBody3D
 
 	// Jump properties
 	[Export] public float jumpVelocity = 7f;
-	private bool _canDoubleJump = true;
+	public bool canDoubleJump = true;
 	public bool airborne = false;
 	[Signal] public delegate void leftGroundEventHandler();
 	[Signal] public delegate void landedEventHandler();
@@ -44,7 +44,7 @@ public partial class Player : CharacterBody3D
 		InitDashing();
 
 		leftGround += () => airborne = true;
-		landed += () => {airborne = false; _canDoubleJump = true;};
+		landed += () => {airborne = false; canDoubleJump = true;};
 	}
 
     public override void _PhysicsProcess(double delta)
@@ -56,20 +56,6 @@ public partial class Player : CharacterBody3D
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is InputEventMouseMotion motionEvent) {
-			RotateY(-motionEvent.Relative.X * lookSensitivity * ((float)Math.PI/180));
-			viewportPivot.RotateX(-motionEvent.Relative.Y * lookSensitivity * ((float)Math.PI/180));
-
-			if (viewportPivot.Rotation.X > Math.PI/2 || viewportPivot.Rotation.X < -Math.PI/2) {
-				viewportPivot.Rotation = new Vector3((float)Mathf.Clamp(viewportPivot.Rotation.X, -Math.PI/2, Math.PI/2), viewportPivot.Rotation.Y, viewportPivot.Rotation.Z);
-			}
-		}
-
-		if (Input.IsActionJustPressed("attack") && canAttack)
-		{
-			FireBasicAttack();
-		}
-
 		// When we attempt to jump, check if we are on the floor or have double jump available
 		if (Input.IsActionJustPressed("jump"))
 		{
@@ -79,10 +65,10 @@ public partial class Player : CharacterBody3D
 				velocity.Y = jumpVelocity;
 				EmitSignal(SignalName.leftGround);
 			}
-			else if (!IsOnFloor() && _canDoubleJump)
+			else if (!IsOnFloor() && canDoubleJump)
 			{
 				velocity.Y = jumpVelocity;
-				_canDoubleJump = false;
+				canDoubleJump = false;
 			}
 			Velocity = velocity;
 		}

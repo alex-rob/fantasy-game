@@ -93,6 +93,10 @@ public partial class PlayerState : IBaseState<Player>
     */
     public virtual IBaseState<Player>? ProcessPhysics(double delta)
     {
+        Vector3 velocity = _parent.Velocity;
+        velocity += _parent.GetGravity() * (float)delta;
+        _parent.Velocity = velocity;
+
         return null;
     }
 }

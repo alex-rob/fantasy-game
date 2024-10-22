@@ -4,15 +4,22 @@ using Library;
 public partial class IdleState : PlayerState
 {
     // Potential states
-    [Export] PlayerState fall_state;
-    [Export] PlayerState jump_state;
-    [Export] PlayerState move_state;
-    [Export] PlayerState dash_state;
+    [Export] PlayerState fallState;
+    [Export] PlayerState jumpState;
+    [Export] PlayerState moveState;
+    [Export] PlayerState dashState;
 
 
     public IdleState(Player player) : base(player)
     {
         // Additional constructor processing can go here.
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        // Reset our double jump
+        _parent.canDoubleJump = true;
     }
 
     public override IBaseState<Player> ProcessInput(InputEvent @event)
@@ -22,17 +29,17 @@ public partial class IdleState : PlayerState
 
         if (Input.IsActionJustPressed("jump") && _parent.IsOnFloor())
         {
-            return jump_state;
+            return jumpState;
         }
 
         if (Input.IsActionJustPressed("dash") && _parent.dashCooldownTimer.IsStopped())
         {
-            return dash_state;
+            return dashState;
         }
 
         if (Vectors.GetCurrentInputDirection() != Vector2.Zero && _parent.IsOnFloor())
         {
-            return move_state;
+            return moveState;
         }
 
         return null;
@@ -40,14 +47,12 @@ public partial class IdleState : PlayerState
 
     public override IBaseState<Player> ProcessPhysics(double delta)
     {
-        Vector3 temp = _parent.Velocity;
-        temp += _parent.GetGravity() * (float)delta;
-        _parent.Velocity = temp;
-        _parent.MoveAndSlide();
+        // Add gravity
+        base.ProcessPhysics(delta);
 
         if (!_parent.IsOnFloor())
         {
-            return fall_state;
+            return fallState;
         }
 
         return null;
