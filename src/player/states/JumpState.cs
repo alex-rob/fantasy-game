@@ -55,6 +55,11 @@ public partial class JumpState : PlayerState
         // Add gravity
         base.ProcessPhysics(delta);
 
+        //TODO Add other directional movement
+
+
+        _parent.MoveAndSlide();
+
         if (_parent.Velocity.Y < 0)
         {
             return fallState;

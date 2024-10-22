@@ -19,7 +19,7 @@ public partial class IdleState : PlayerState
     {
         base.Enter();
         // Reset our double jump
-        _parent.canDoubleJump = true;
+        if (!_parent.canDoubleJump) _parent.canDoubleJump = true;
     }
 
     public override IBaseState<Player> ProcessInput(InputEvent @event)
@@ -49,8 +49,9 @@ public partial class IdleState : PlayerState
     {
         // Add gravity
         base.ProcessPhysics(delta);
+        _parent.MoveAndSlide();
 
-        if (!_parent.IsOnFloor())
+        if (!_parent.IsOnFloor() && _parent.Velocity.Y < 0)
         {
             return fallState;
         }
