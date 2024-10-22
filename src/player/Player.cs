@@ -12,8 +12,8 @@ public partial class Player : CharacterBody3D
 	
 	// Viewport properties
 	[Export] public float lookSensitivity = 0.3f;
-	private Camera3D _viewport;
-	private Node3D _viewportPivot;
+	public Camera3D viewport;
+	public Node3D viewportPivot;
 
 	// Jump properties
 	[Export] public float jumpVelocity = 7f;
@@ -24,7 +24,7 @@ public partial class Player : CharacterBody3D
 
 	// Attack properties
 	private Attack _basicAttack;
-	private bool _canAttack = true;
+	public bool canAttack = true;
 	public ShapeCast3D attackHitbox;
 	public Timer attackCooldown;
 
@@ -33,7 +33,7 @@ public partial class Player : CharacterBody3D
 	private float _dashCooldown = 1.0f;
 	private float _dashImpulse = 25f;
 	private Timer _dashDurationTimer = new Timer();
-	private Timer _dashCooldownTimer = new Timer();
+	public Timer dashCooldownTimer = new Timer();
 	[Signal] public delegate void dashingEventHandler();
 	
 
@@ -58,14 +58,14 @@ public partial class Player : CharacterBody3D
     {
         if (@event is InputEventMouseMotion motionEvent) {
 			RotateY(-motionEvent.Relative.X * lookSensitivity * ((float)Math.PI/180));
-			_viewportPivot.RotateX(-motionEvent.Relative.Y * lookSensitivity * ((float)Math.PI/180));
+			viewportPivot.RotateX(-motionEvent.Relative.Y * lookSensitivity * ((float)Math.PI/180));
 
-			if (_viewportPivot.Rotation.X > Math.PI/2 || _viewportPivot.Rotation.X < -Math.PI/2) {
-				_viewportPivot.Rotation = new Vector3((float)Mathf.Clamp(_viewportPivot.Rotation.X, -Math.PI/2, Math.PI/2), _viewportPivot.Rotation.Y, _viewportPivot.Rotation.Z);
+			if (viewportPivot.Rotation.X > Math.PI/2 || viewportPivot.Rotation.X < -Math.PI/2) {
+				viewportPivot.Rotation = new Vector3((float)Mathf.Clamp(viewportPivot.Rotation.X, -Math.PI/2, Math.PI/2), viewportPivot.Rotation.Y, viewportPivot.Rotation.Z);
 			}
 		}
 
-		if (Input.IsActionJustPressed("attack") && _canAttack)
+		if (Input.IsActionJustPressed("attack") && canAttack)
 		{
 			FireBasicAttack();
 		}
@@ -87,7 +87,7 @@ public partial class Player : CharacterBody3D
 			Velocity = velocity;
 		}
 
-		if (Input.IsActionJustPressed("dash") && _dashCooldownTimer.IsStopped())
+		if (Input.IsActionJustPressed("dash") && dashCooldownTimer.IsStopped())
 		{
 			Vector2 dir = Vectors.GetCurrentInputDirection();
 			if (dir == Vector2.Zero) dir = Vector2.Up;
@@ -102,7 +102,7 @@ public partial class Player : CharacterBody3D
 		// Add the gravity.
 		if (!IsOnFloor() && _dashDurationTimer.IsStopped())
 		{
-			targetVelocity += GetGravity() * 1.75f * (float)delta;
+			targetVelocity += GetGravity() * (float)delta;
 		}
 		else
 		{
@@ -153,13 +153,13 @@ public partial class Player : CharacterBody3D
 
 		attackCooldown.WaitTime = _basicAttack.cooldown;
 
-		attackCooldown.Timeout += () => _canAttack = true;
+		attackCooldown.Timeout += () => canAttack = true;
 	}
 
-	private void FireBasicAttack()
+	public void FireBasicAttack()
 	{
 		// Set _canAttack to false and start the attack cooldown timer
-		_canAttack = false;
+		canAttack = false;
 		attackCooldown.Start();
 		if (attackHitbox.IsColliding())
 		{
@@ -180,9 +180,9 @@ public partial class Player : CharacterBody3D
 		_dashDurationTimer.OneShot = true;
 		_dashDurationTimer.WaitTime = _dashDuration;
 		AddChild(_dashDurationTimer);
-		_dashCooldownTimer.OneShot = true;
-		_dashCooldownTimer.WaitTime = _dashCooldown;
-		AddChild(_dashCooldownTimer);
+		dashCooldownTimer.OneShot = true;
+		dashCooldownTimer.WaitTime = _dashCooldown;
+		AddChild(dashCooldownTimer);
 	}
 
 	private void PlayerDash(Vector2 inputDir, Transform3D curTransform)
@@ -196,14 +196,14 @@ public partial class Player : CharacterBody3D
 		Velocity = new Vector3(targetVelocity.X, 0, targetVelocity.Z);
 
 		_dashDurationTimer.Start();
-		_dashCooldownTimer.Start();
+		dashCooldownTimer.Start();
 		EmitSignal(SignalName.dashing);
 	}
 
 	private void InitViewport()
 	{
-		_viewportPivot = GetNode<Node3D>("CameraPivot");
-		_viewport = GetNode<Camera3D>("Camera3D");
+		viewportPivot = GetNode<Node3D>("CameraPivot");
+		viewport = GetNode<Camera3D>("Camera3D");
 	}
 
 }
