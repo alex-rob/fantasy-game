@@ -5,36 +5,37 @@ using Library;
 public partial class Player : CharacterBody3D
 {
 	// Movement properties
-	[Export] public float max_speed = 9f;
-	private float _acceleration = 0.085f;
-	private float _deceleration = 0.3f;
-	private float _airDeceleration = 0.03f;
+	[Export] public float MaxSpeed = 9f;
+	public float Acceleration = 0.085f;
+	public float Deceleration = 0.3f;
+	public float AirAcceleration = 0.1f;
+	public float AirDeceleration = 0.03f;
 	
 	// Viewport properties
-	[Export] public float lookSensitivity = 0.3f;
-	public Camera3D viewport;
-	public Node3D viewportPivot;
+	[Export] public float LookSensitivity = 0.3f;
+	public Camera3D Viewport;
+	public Node3D ViewportPivot;
 
 	// Jump properties
-	[Export] public float jumpVelocity = 7f;
-	public bool canDoubleJump = true;
-	public bool airborne = false;
-	[Signal] public delegate void leftGroundEventHandler();
-	[Signal] public delegate void landedEventHandler();
+	[Export] public float JumpVelocity = 7f;
+	public bool CanDoubleJump = true;
+	public bool Airborne = false;
+	[Signal] public delegate void LeftGroundEventHandler();
+	[Signal] public delegate void LandedEventHandler();
 
 	// Attack properties
 	private Attack _basicAttack;
-	public bool canAttack = true;
-	public ShapeCast3D attackHitbox;
-	public Timer attackCooldown;
+	public bool CanAttack = true;
+	public ShapeCast3D AttackHitbox;
+	public Timer AttackCooldown;
 
 	// Dash properties
 	private float _dashDuration = 0.25f;
 	private float _dashCooldown = 1.0f;
 	private float _dashImpulse = 25f;
-	private Timer _dashDurationTimer = new Timer();
-	public Timer dashCooldownTimer = new Timer();
-	[Signal] public delegate void dashingEventHandler();
+	public Timer DashDurationTimer = new Timer();
+	public Timer DashCooldownTimer = new Timer();
+	[Signal] public delegate void DashingEventHandler();
 	
 
     public override void _Ready()
@@ -43,14 +44,14 @@ public partial class Player : CharacterBody3D
 		InitViewport();
 		InitDashing();
 
-		leftGround += () => airborne = true;
-		landed += () => {airborne = false; canDoubleJump = true;};
+		LeftGround += () => Airborne = true;
+		Landed += () => {Airborne = false; CanDoubleJump = true;};
 	}
 
     public override void _PhysicsProcess(double delta)
 	{
 		Vector2 inputDir = Vectors.GetCurrentInputDirection();
-		Velocity = HandlePlayerMovement(inputDir, Transform, Velocity, _acceleration, delta);
+		Velocity = HandlePlayerMovement(inputDir, Transform, Velocity, Acceleration, delta);
 		MoveAndSlide();
 	}
 
@@ -62,18 +63,18 @@ public partial class Player : CharacterBody3D
 			Vector3 velocity = Velocity;
 			if (IsOnFloor())
 			{
-				velocity.Y = jumpVelocity;
-				EmitSignal(SignalName.leftGround);
+				velocity.Y = JumpVelocity;
+				EmitSignal(SignalName.LeftGround);
 			}
-			else if (!IsOnFloor() && canDoubleJump)
+			else if (!IsOnFloor() && CanDoubleJump)
 			{
-				velocity.Y = jumpVelocity;
-				canDoubleJump = false;
+				velocity.Y = JumpVelocity;
+				CanDoubleJump = false;
 			}
 			Velocity = velocity;
 		}
 
-		if (Input.IsActionJustPressed("dash") && dashCooldownTimer.IsStopped())
+		if (Input.IsActionJustPressed("dash") && DashCooldownTimer.IsStopped())
 		{
 			Vector2 dir = Vectors.GetCurrentInputDirection();
 			if (dir == Vector2.Zero) dir = Vector2.Up;
@@ -86,16 +87,16 @@ public partial class Player : CharacterBody3D
 		Vector3 targetVelocity = curVelocity;
 
 		// Add the gravity.
-		if (!IsOnFloor() && _dashDurationTimer.IsStopped())
+		if (!IsOnFloor() && DashDurationTimer.IsStopped())
 		{
 			targetVelocity += GetGravity() * (float)delta;
 		}
 		else
 		{
-			// If we were airborne before touching the floor, emit our landing signal
-			if (airborne)
+			// If we were Airborne before touching the floor, emit our landing signal
+			if (Airborne)
 			{
-				EmitSignal(SignalName.landed);
+				EmitSignal(SignalName.Landed);
 			}
 		}
 
@@ -108,20 +109,20 @@ public partial class Player : CharacterBody3D
 		// at the rate of our acceleration.
 		if (direction != Vector3.Zero)
 		{
-			targetVelocity = Vectors.MoveTowardsXZ(targetVelocity, direction*max_speed, acceleration);
+			targetVelocity = Vectors.MoveTowardsXZ(targetVelocity, direction*MaxSpeed, acceleration);
 		}
 		// If no input direction, decelerate us based on if we are on a surface or not.
 		else
 		{
-			// Ensure a duration of frictionless motion when we dash, dictated by _dashDurationTimer, otherwise we decelerate.
-			if (_dashDurationTimer.IsStopped()) {
+			// Ensure a duration of frictionless motion when we dash, dictated by DashDurationTimer, otherwise we decelerate.
+			if (DashDurationTimer.IsStopped()) {
 				if (IsOnFloor()) 
 				{
-					targetVelocity = Vectors.MoveTowardsXZ(targetVelocity, Vector3.Zero, _deceleration);
+					targetVelocity = Vectors.MoveTowardsXZ(targetVelocity, Vector3.Zero, Deceleration);
 				}
 				else
 				{
-					targetVelocity = Vectors.MoveTowardsXZ(targetVelocity, Vector3.Zero, _airDeceleration);
+					targetVelocity = Vectors.MoveTowardsXZ(targetVelocity, Vector3.Zero, AirDeceleration);
 				}
 			}
 			
@@ -134,24 +135,24 @@ public partial class Player : CharacterBody3D
 	private void InitAttacking()
 	{
 		_basicAttack = new Attack();
-		attackHitbox = GetNode<ShapeCast3D>("Hitbox");
-		attackCooldown = GetNode<Timer>("AttackCooldown");
+		AttackHitbox = GetNode<ShapeCast3D>("Hitbox");
+		AttackCooldown = GetNode<Timer>("AttackCooldown");
 
-		attackCooldown.WaitTime = _basicAttack.cooldown;
+		AttackCooldown.WaitTime = _basicAttack.cooldown;
 
-		attackCooldown.Timeout += () => canAttack = true;
+		AttackCooldown.Timeout += () => CanAttack = true;
 	}
 
 	public void FireBasicAttack()
 	{
-		// Set _canAttack to false and start the attack cooldown timer
-		canAttack = false;
-		attackCooldown.Start();
-		if (attackHitbox.IsColliding())
+		// Set _CanAttack to false and start the attack cooldown timer
+		CanAttack = false;
+		AttackCooldown.Start();
+		if (AttackHitbox.IsColliding())
 		{
-			for(int collision = 0; collision < attackHitbox.GetCollisionCount(); collision++)
+			for(int collision = 0; collision < AttackHitbox.GetCollisionCount(); collision++)
 			{
-				var collider = attackHitbox.GetCollider(collision) as Node;
+				var collider = AttackHitbox.GetCollider(collision) as Node;
 				if (collider is Hurtbox && collider.IsInGroup("Enemies"))
 				{
 					Hurtbox target = (Hurtbox) collider;
@@ -163,12 +164,12 @@ public partial class Player : CharacterBody3D
 
 	private void InitDashing()
 	{
-		_dashDurationTimer.OneShot = true;
-		_dashDurationTimer.WaitTime = _dashDuration;
-		AddChild(_dashDurationTimer);
-		dashCooldownTimer.OneShot = true;
-		dashCooldownTimer.WaitTime = _dashCooldown;
-		AddChild(dashCooldownTimer);
+		DashDurationTimer.OneShot = true;
+		DashDurationTimer.WaitTime = _dashDuration;
+		AddChild(DashDurationTimer);
+		DashCooldownTimer.OneShot = true;
+		DashCooldownTimer.WaitTime = _dashCooldown;
+		AddChild(DashCooldownTimer);
 	}
 
 	private void PlayerDash(Vector2 inputDir, Transform3D curTransform)
@@ -181,15 +182,15 @@ public partial class Player : CharacterBody3D
 		Vector3 targetVelocity = direction * _dashImpulse;
 		Velocity = new Vector3(targetVelocity.X, 0, targetVelocity.Z);
 
-		_dashDurationTimer.Start();
-		dashCooldownTimer.Start();
-		EmitSignal(SignalName.dashing);
+		DashDurationTimer.Start();
+		DashCooldownTimer.Start();
+		EmitSignal(SignalName.Dashing);
 	}
 
 	private void InitViewport()
 	{
-		viewportPivot = GetNode<Node3D>("CameraPivot");
-		viewport = GetNode<Camera3D>("Camera3D");
+		ViewportPivot = GetNode<Node3D>("CameraPivot");
+		Viewport = GetNode<Camera3D>("Camera3D");
 	}
 
 }
